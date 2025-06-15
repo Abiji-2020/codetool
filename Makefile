@@ -1,12 +1,12 @@
 APP_NAME = codetool
 
-.PHONY: build run clean test lint fmt
+.PHONY: build run clean test lint fmt 
 
 build:
 	go build -o $(APP_NAME) main.go
 
 run:
-	go run main.go start
+	go run main.go 
 
 clean:
 	rm -f $(APP_NAME)
@@ -19,3 +19,4 @@ lint:
 
 fmt:
 	go fmt ./...
+
