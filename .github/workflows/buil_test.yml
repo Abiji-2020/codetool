@@ -22,11 +22,11 @@ jobs:
     - name: Install deps
       run: go mod tidy
 
-    - name: Lint
-      run: |
-        go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-        golangci-lint run
-
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+            version: latest
+            
     - name: Run tests
       run: go test ./...
 
