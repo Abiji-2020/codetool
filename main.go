@@ -1,11 +1,16 @@
 /*
 Copyright © 2025 Abinand P
-
 */
 package main
 
-import "github.com/Abiji-2020/codetool/cmd"
+import (
+	"log"
+
+	"github.com/Abiji-2020/codetool/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
