@@ -11,13 +11,13 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "codetool",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "A tool for generating code templates",
+	Long: `A simple code tool, which can generate 
+	various code templates for different programming languages, 
+	such as Python, Go, Java, Javascript and Ruby. 
+	
+	It generates the code with the help of knowledgebase from the dataset
+	https://huggingface.co/datasets/claudios/code_search_net `,
 }
 
 func Execute() {
