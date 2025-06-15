@@ -1,24 +1,18 @@
 # .golangci.yml
 version: "2"
-run:
-  timeout: 2m
+run: 
+  timeout: 5m
   tests: true
+  concurrency: 8
 
+output:
+  formats:
+    text:
+      print-issued-lines: true
+      colors: true
+  show-stats: true
 linters:
-  enable:
-    - govet         # Basic logic and correctness issues
-    - errcheck      # Unchecked errors
-    - staticcheck   # Best-practices and potential bugs
-    - gosimple      # Simplify overcomplicated code
-    - unused        # Detect unused variables, funcs, etc.
-    - typecheck     # Type errors
-    - deadcode      # Dead/unreachable code
-    - structcheck   # Unused struct fields
-    - gofmt         # Formatting
-    - goimports     # Formatting + import sorting
-    - misspell      # Typos in comments/strings
-    - revive        # Style and convention linter
-
+  default: standard
 issues:
   max-same-issues: 3
   max-issues-per-linter: 30
