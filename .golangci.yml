@@ -1,0 +1,19 @@
+# .golangci.yml
+version: "2"
+run: 
+  timeout: 5m
+  tests: true
+  concurrency: 8
+
+output:
+  formats:
+    text:
+      print-issued-lines: true
+      colors: true
+  show-stats: true
+linters:
+  default: standard
+issues:
+  max-same-issues: 3
+  max-issues-per-linter: 30
+  
