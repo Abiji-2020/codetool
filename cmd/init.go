@@ -15,5 +15,10 @@ var initCmd = &cobra.Command{
 		} else {
 			cmd.Println("Project initialized successfully.")
 		}
+		if err := pkg.CreateTable(); err != nil {
+			cmd.PrintErr("Error creating table:", err)
+		} else {
+			cmd.Println("Table created successfully.")
+		}
 	},
 }
