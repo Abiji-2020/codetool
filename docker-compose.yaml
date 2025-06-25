@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mindsdb:
+    image: mindsdb/mindsdb:latest
+    container_name: mindsdb_container
+    depends_on:
+      - pgvector
+      - ollama-intel-gpu
+    ports:
+      - "47334:47334"
+    command: bash -c "pip install --upgrade litellm && mindsdb"
+    networks:
+      - mindsdb_net
+
+  pgvector:
+    image: ankane/pgvector
+    container_name: pgvector_container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: pgvector_user
+      POSTGRES_PASSWORD: pgvector_password
+      POSTGRES_DB: pgvector_db
+    networks:
+      - mindsdb_net
+
+  ollama-intel-gpu:
+    build: 
+      context: .
+      dockerfile: Dockerfile.ollama 
+      args:
+        IPEXLLM_RELEASE_REPO: ipex-llm/ipex-llm
+        IPEXLLM_RELEASE_VERSON: v2.2.0
+        IPEXLLM_PORTABLE_ZIP_FILENAME: ollama-ipex-llm-2.2.0-ubuntu.tgz
+    container_name: ollama-intel-gpu
+    restart: always
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ollama-intel-gpu:/root/.ollama
+    environment:
+      - ONEAPI_DEVICE_SELECTOR=level_zero:gpu;level_zero:cpu
+      - IPEX_LLM_NUM_CTX=16384
+      - IPEX_LLM_USE_INT8=1
+      - IPEX_LLM_ENABLE_TPP=1
+      - IPEX_LLM_NUM_STREAMS=4
+      - OLLAMA_INTEL_GPU=true
+    ports: 
+      - "11434:11434"
+    networks:
+      - mindsdb_net
+
+volumes:
+  ollama-intel-gpu: {}
+
+networks:
+  mindsdb_net:
