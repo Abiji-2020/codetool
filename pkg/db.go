@@ -10,16 +10,17 @@ import (
 )
 
 func ConnectToDatabase() error {
-	query := `CREATE DATABASE IF NOT EXISTS codetool with 
-	engine = 'pgvector', 
-	parameters = {
-	"host": "pgvector",
-	"port": 5432,
-	"user":"pgvector_user",
-	"password":"pgvector_password",
-	"distance": "cosine",
-	"database": "pgvector_db"
-  };`
+	query := fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS codetool WITH 
+    engine = 'pgvector', 
+    parameters = {
+        "host": "%s",
+        "port": %d,
+        "user": "%s",
+        "password": "%s",
+        "distance": "cosine",
+        "database": "%s"
+    };`, config.Host, config.Port, config.User, config.Password, config.MainDatabase)
+
 	httpClient := &http.Client{}
 	endpoint := "/api/sql/query"
 
@@ -40,8 +41,11 @@ func ConnectToDatabase() error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Printf("Warning: failed to close response body: %v\n", closeErr)
+		}
+	}()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to connect to database: %s", resp.Status)
 	}
@@ -50,14 +54,15 @@ func ConnectToDatabase() error {
 }
 
 func CreateTable() error {
-	query := `CREATE TABLE codetool.code_snippets (
-	id SERIAL PRIMARY KEY,
-	language VARCHAR(50) NOT NULL,
-	snippet TEXT NOT NULL,
-	repo TEXT NOT NULL,
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	url TEXT NOT NULL
-	);`
+	query := fmt.Sprintf(`CREATE TABLE %s.%s (
+        id SERIAL PRIMARY KEY,
+        language VARCHAR(50) NOT NULL,
+        snippet TEXT NOT NULL,
+        repo TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        url TEXT NOT NULL
+    );`, config.Database, config.Table)
+
 	httpClient := &http.Client{}
 	endpoint := "/api/sql/query"
 	payload := map[string]any{
@@ -78,7 +83,11 @@ func CreateTable() error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Printf("Warning: failed to close response body: %v\n", closeErr)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to create table: %s", resp.Status)
