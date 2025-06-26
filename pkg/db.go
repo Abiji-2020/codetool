@@ -1,15 +1,13 @@
 package pkg
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/Abiji-2020/codetool/config"
 )
 
-func ConnectToDatabase() error {
+func (c *MindsDBClient) ConnectToDatabase() error {
 	query := fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS codetool WITH 
     engine = 'pgvector', 
     parameters = {
@@ -21,39 +19,30 @@ func ConnectToDatabase() error {
         "database": "%s"
     };`, config.Host, config.Port, config.User, config.Password, config.MainDatabase)
 
-	httpClient := &http.Client{}
-	endpoint := "/api/sql/query"
-
 	payload := map[string]any{
 		"query": query,
 	}
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("failed to marshal payload: %v", err)
-	}
-	req, err := http.NewRequest("POST", config.BASE_MINDSDB_URL+endpoint, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := httpClient.Do(req)
+	response, err := c.makeRequest("POST", "/api/sql/query", payload)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to database: %v", err)
 	}
-	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
-			fmt.Printf("Warning: failed to close response body: %v\n", closeErr)
-		}
-	}()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to connect to database: %s", resp.Status)
+
+	// Parse response to check for errors
+	var result map[string]interface{}
+	if err := json.Unmarshal(response, &result); err != nil {
+		return fmt.Errorf("failed to parse response: %v", err)
+	}
+
+	// Check if there's an error in the response
+	if errorMsg, exists := result["error"]; exists {
+		return fmt.Errorf("database connection failed: %v", errorMsg)
 	}
 
 	return nil
 }
 
-func CreateTable() error {
+func (c *MindsDBClient) CreateTable() error {
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s.%s (
         id SERIAL PRIMARY KEY,
         language VARCHAR(50) NOT NULL,
@@ -63,34 +52,54 @@ func CreateTable() error {
         url TEXT NOT NULL
     );`, config.Database, config.Table)
 
-	httpClient := &http.Client{}
-	endpoint := "/api/sql/query"
 	payload := map[string]any{
 		"query": query,
 	}
-	payloadBytes, err := json.Marshal(payload)
 
+	response, err := c.makeRequest("POST", "/api/sql/query", payload)
 	if err != nil {
-		return fmt.Errorf("failed to marshal payload: %v", err)
+		return fmt.Errorf("failed to create table: %v", err)
 	}
-	req, err := http.NewRequest("POST", config.BASE_MINDSDB_URL+endpoint, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		return fmt.Errorf("failed to create request: %v", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute request: %v", err)
+	// Parse response to check for errors
+	var result map[string]interface{}
+	if err := json.Unmarshal(response, &result); err != nil {
+		return fmt.Errorf("failed to parse response: %v", err)
 	}
-	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
-			fmt.Printf("Warning: failed to close response body: %v\n", closeErr)
+
+	// Check if there's an error in the response
+	if errorMsg, exists := result["error"]; exists {
+		return fmt.Errorf("table creation failed: %v", errorMsg)
+	}
+
+	return nil
+}
+
+func (c *MindsDBClient) InsertCodeSnippets(languageData map[string][]CodeSnippets) error {
+	for language, snippets := range languageData {
+		for _, snippet := range snippets {
+			query := fmt.Sprintf(`INSERT INTO %s.%s (language, snippet, repo, url) VALUES ('%s', '%s', '%s', '%s');`,
+				config.Database, config.Table, language, snippet.Code, snippet.Repo, snippet.URL)
+
+			payload := map[string]any{
+				"query": query,
+			}
+
+			response, err := c.makeRequest("POST", "/api/sql/query", payload)
+			if err != nil {
+				return fmt.Errorf("failed to insert snippet for %s: %v", language, err)
+			}
+
+			// Parse response to check for errors
+			var result map[string]interface{}
+			if err := json.Unmarshal(response, &result); err != nil {
+				return fmt.Errorf("failed to parse insert response: %v", err)
+			}
+
+			if errorMsg, exists := result["error"]; exists {
+				return fmt.Errorf("insert failed for %s: %v", language, errorMsg)
+			}
 		}
-	}()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to create table: %s", resp.Status)
 	}
 
 	return nil

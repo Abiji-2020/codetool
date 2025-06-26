@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/Abiji-2020/codetool/pkg"
 	"github.com/spf13/cobra"
 )
@@ -10,15 +12,15 @@ var initCmd = &cobra.Command{
 	Short: "Initialize the project",
 	Long:  `Initialize the project by setting up the necessary files and directories.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := pkg.ConnectToDatabase(); err != nil {
-			cmd.Println("Error initializing project:", err)
-		} else {
-			cmd.Println("Project initialized successfully.")
+		client := pkg.NewMindsDBClient("")
+		if err := client.ConnectToDatabase(); err != nil {
+			fmt.Println("Error connecting to database:", err)
+			return
 		}
-		if err := pkg.CreateTable(); err != nil {
-			cmd.PrintErr("Error creating table:", err)
-		} else {
-			cmd.Println("Table created successfully.")
+		if err := client.CreateTable(); err != nil {
+			fmt.Println("Error creating table:", err)
+			return
 		}
+		fmt.Println("Project initialized successfully.")
 	},
 }
