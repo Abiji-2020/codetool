@@ -54,7 +54,7 @@ func ConnectToDatabase() error {
 }
 
 func CreateTable() error {
-	query := fmt.Sprintf(`CREATE TABLE %s.%s (
+	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s.%s (
         id SERIAL PRIMARY KEY,
         language VARCHAR(50) NOT NULL,
         snippet TEXT NOT NULL,
