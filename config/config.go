@@ -5,12 +5,19 @@ const (
 )
 
 var (
-	Database     = "codetool"
-	Host         = "pgvector"
-	Port         = 5432
-	User         = "pgvector_user"
-	Password     = "pgvector_password"
-	MainDatabase = "pgvector_db"
-	Distance     = "cosine"
-	Table        = "code_snippets"
+	Database               = "codetool"
+	Host                   = "pgvector"
+	Port                   = 5432
+	User                   = "pgvector_user"
+	Password               = "pgvector_password"
+	MainDatabase           = "pgvector_db"
+	Distance               = "cosine"
+	Table                  = "code_snippets"
+	EmbeddingModelProvider = "ollama"
+	EmbeddingModelName     = ""
+	EmbeddingBaseUrl       = ""
+	RerankingModelProvider = "ollama"
+	RerankingModelName     = ""
+	RerankingBaseUrl       = ""
+	StorageSchema          = ""
 )
