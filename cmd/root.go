@@ -10,7 +10,8 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "codetool",
 	Short: "A tool for generating code templates",
-	Long: `A simple code tool, which can generate 
+	Long: `
+	A simple code tool, which can generate 
 	various code templates for different programming languages, 
 	such as Python, Go, Java, Javascript and Ruby. 
 	
@@ -28,4 +29,6 @@ func Execute() error {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle this and ")
+	rootCmd.AddCommand(trainCmd)
+	rootCmd.AddCommand(initCmd)
 }
