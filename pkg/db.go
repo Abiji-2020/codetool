@@ -68,7 +68,7 @@ func (c *MindsDBClient) CreateTable() error {
 	}
 
 	// Check if there's an error in the response
-	if errorMsg, exists := result["error"]; exists {
+	if errorMsg, exists := result["error_message"]; exists {
 		return fmt.Errorf("table creation failed: %v", errorMsg)
 	}
 

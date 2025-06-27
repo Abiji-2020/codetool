@@ -50,6 +50,9 @@ services:
       - "11434:11434"
     networks:
       - mindsdb_net
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
 
 volumes:
   ollama-intel-gpu: {}

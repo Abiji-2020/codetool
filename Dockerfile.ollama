@@ -33,5 +33,7 @@ RUN cd / && \
   rm ${IPEXLLM_PORTABLE_ZIP_FILENAME}
 
 ENV OLLAMA_HOST=0.0.0.0:11434
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/bin/bash", "/start-ollama.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

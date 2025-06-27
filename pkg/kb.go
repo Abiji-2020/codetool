@@ -20,14 +20,14 @@ func (c *MindsDBClient) CreateKnowledgeBase(name string) error {
 		embedding_model = {
 			"provider": "%s",
 			"model_name": "%s",
-			"base_url": "%s",
+			"base_url": "%s"
 		},
 		reranking_model = {
 			"provider" : "%s",
 			"model_name" : "%s",
 			"base_url" : "%s"
 		},
-		stoage = %s.%s, 
+		storage = %s.%s, 
 		metadata_columns = ["language", "repo", "url"],
 		content_columns = ["code", "documentation"],
 		id_column = "id";	
@@ -38,7 +38,7 @@ func (c *MindsDBClient) CreateKnowledgeBase(name string) error {
 		config.RerankingModelProvider,
 		config.RerankingModelName,
 		config.RerankingBaseUrl,
-		config.MainDatabase,
+		config.CodeDatabase,
 		config.StorageSchema,
 	)
 	_, err := c.ExecuteSQL(query)
