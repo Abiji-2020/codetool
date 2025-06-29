@@ -11,7 +11,7 @@ done
 
 echo "Pulling models..."
 LOG_LEVEL=debug /ollama pull bge-m3:latest
-LOG_LEVEL=debug /ollama pull llama3.1:8b
+LOG_LEVEL=debug /ollama pull llama3.2:1b
 
 wait
 

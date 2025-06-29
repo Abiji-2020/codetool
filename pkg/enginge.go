@@ -8,7 +8,7 @@ import (
 
 func (c *MindsDBClient) CreateEngine() error {
 	query := fmt.Sprintf(`
-	CREATE ML_ENGINE IF NOT EXISTS ollama_engine
+	CREATE  ML_ENGINE IF NOT EXISTS ollama_engine
 	FROM ollama
 	USING 
 		base_url = '%s'

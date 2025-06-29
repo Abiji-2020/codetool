@@ -9,7 +9,7 @@ services:
       - ollama-intel-gpu
     ports:
       - "47334:47334"
-    command: bash -c "pip install --upgrade litellm && mindsdb"
+    command: bash -c "pip install litellm>=1.73.0 && mindsdb"
     networks:
       - mindsdb_net
 
